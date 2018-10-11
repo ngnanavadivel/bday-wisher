@@ -1,27 +1,35 @@
 package com.gnanavad.utils.bday_wisher.cfg;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
 public class ExcelConfig {
 
-    private static final String      EXCEL_CONFIG_PROPERTIES = "excel-config.properties";
+    private static final String      EXCEL_CONFIG_PROPERTIES = "./excel-config.properties";
 
     private Properties               props                   = new Properties();
 
     private static final ExcelConfig _instance               = new ExcelConfig();
 
     private ExcelConfig() {
-        InputStream stream = Thread.currentThread()
-                                   .getContextClassLoader()
-                                   .getResourceAsStream(EXCEL_CONFIG_PROPERTIES);
-        if (stream != null) {
-            try {
+        InputStream stream = null;
+        try {
+            stream = new FileInputStream(new File(EXCEL_CONFIG_PROPERTIES));
+            if (stream != null) {
                 props.load(stream);
-            } catch (IOException e) {
-                System.out.println("Failed to load excel sheet configuration file : " + EXCEL_CONFIG_PROPERTIES);
-                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            System.out.println("ERROR: Failed to load excel sheet configuration file : " + EXCEL_CONFIG_PROPERTIES);
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e) {
+                    // Just swallow it ;)
+                }
             }
         }
     }
@@ -37,6 +45,14 @@ public class ExcelConfig {
 
     public static String getExcelSheetFileName() {
         return getProperty(KeyConstants.EXCEL_SHEET_FILE_NAME);
+    }
+
+    public static String getMailerEmailId() {
+        return getProperty(KeyConstants.MAILER_EMAIL_ID);
+    }
+
+    public static String getMailerEncodedPassword() {
+        return getProperty(KeyConstants.MAILER_ENCODED_PASSWORD);
     }
 
     public static Integer getWorkSheetIndex() {
@@ -58,11 +74,11 @@ public class ExcelConfig {
     public static Integer getDOBColumnIndex() {
         return getIntegerFromString(KeyConstants.DOB_CELL_INDEX);
     }
-    
+
     public static Integer getEmailColumnIndex() {
         return getIntegerFromString(KeyConstants.EMAIL_CELL_INDEX);
     }
-    
+
     public static Integer getStudentPhoneNumberColumnIndex() {
         return getIntegerFromString(KeyConstants.PHONE_NUMBER_CELL_INDEX);
     }
